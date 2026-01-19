@@ -48,21 +48,22 @@ pipeline {
                 }
             }
         }
-
         stage('Build & Deploy JAR to Nexus') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'nexus-credentials',
-                    usernameVariable: 'NEXUS_USER',
-                    passwordVariable: 'NEXUS_PASS'
-                )]) {
-                    sh '''
-                    mvn clean deploy -DskipTests
-                    '''
-                }
-            }
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'nexus-credentials',
+                usernameVariable: 'NEXUS_USER',
+                passwordVariable: 'NEXUS_PASS'
+            )
+        ]) {
+            sh """
+            mvn clean deploy -DskipTests \
+              -DaltDeploymentRepository=nexus-releases::default::http://13.232.55.198:8081/repository/maven-releases/
+            """
         }
-
+    }
+}
         stage('Build Docker Image') {
             steps {
                 sh """
