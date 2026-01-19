@@ -20,7 +20,6 @@
     <packaging>jar</packaging>
 
     <name>Country Chicken Backend</name>
-    <description>Backend service for Country Chicken Application</description>
 
     <!-- ===================== -->
     <!-- Properties -->
@@ -32,50 +31,54 @@
     </properties>
 
     <!-- ===================== -->
+    <!-- Nexus Deployment -->
+    <!-- ===================== -->
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Releases</name>
+            <url>http://13.232.55.198:8081/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
+    <!-- ===================== -->
     <!-- Dependencies -->
     <!-- ===================== -->
     <dependencies>
 
-        <!-- Spring Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Swagger / OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- H2 Database -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -84,23 +87,19 @@
 
     </dependencies>
 
-    <!-- ===================== -->
+OB    <!-- ===================== -->
     <!-- Build -->
     <!-- ===================== -->
     <build>
+OB        <finalName>country-chicken-backend-${project.version}</finalName>
 
-        <!-- Predictable JAR name -->
-        <finalName>country-chicken-backend-${project.version}</finalName>
-
-        <plugins>
-
-            <!-- Spring Boot Plugin -->
-            <plugin>
+OB        <plugins>
+OB            <plugin>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+OB                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
         </plugins>
-    </build>
+OBOB    </build>
 
 </project>
+
