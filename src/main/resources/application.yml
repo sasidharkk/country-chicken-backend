@@ -1,0 +1,106 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+spring:
+  application:
+    name: country-chicken-backend
+  
+  # H2 Database Configuration
+  datasource:
+    url: jdbc:h2:mem:countrychicken
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    initialization-mode: always
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+  
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+  
+  # Actuator Configuration
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,prometheus
+        base-path: /actuator
+    endpoint:
+      health:
+        show-details: always
+        probes:
+          enabled: true
+    metrics:
+      export:
+        prometheus:
+          enabled: true
+  
+  # Logging Configuration
+  output:
+    ansi:
+      enabled: always
+
+# Logging Configuration
+logging:
+  level:
+    com.countrychicken: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+    max-size: 10MB
+    max-history: 30
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  packages-to-scan: com.countrychicken.controller
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+# Application Configuration
+app:
+  name: Country Chicken Business Management System
+  version: 1.0.0
+  description: Backend API for managing chicken business operations
+  contact:
+    email: support@countrychicken.com
+    phone: +1-800-CHICKEN
+  business:
+    working-hours: "09:00-18:00"
+    delivery-hours: "10:00-20:00"
