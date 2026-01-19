@@ -1,8 +1,10 @@
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,68 +19,66 @@
     <groupId>com.countrychicken</groupId>
     <artifactId>country-chicken-backend</artifactId>
     <version>1.0.0</version>
-    <packaging>jar</packaging>
 
     <name>Country Chicken Backend</name>
+    <description>Backend service for Country Chicken Application</description>
 
     <!-- ===================== -->
     <!-- Properties -->
     <!-- ===================== -->
     <properties>
+        <!-- Java 17 everywhere -->
         <java.version>17</java.version>
+
         <springdoc.version>1.7.0</springdoc.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <!-- ===================== -->
-    <!-- Nexus Deployment -->
-    <!-- ===================== -->
-    <distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <name>Nexus Releases</name>
-            <url>http://13.232.55.198:8081/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
 
     <!-- ===================== -->
     <!-- Dependencies -->
     <!-- ===================== -->
     <dependencies>
 
+        <!-- Spring Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- Actuator (required for Docker healthcheck) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- Swagger / OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
 
+        <!-- H2 (Dev/Test) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
 
+        <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -87,19 +87,42 @@
 
     </dependencies>
 
-OB    <!-- ===================== -->
+    <!-- ===================== -->
     <!-- Build -->
     <!-- ===================== -->
     <build>
-OB        <finalName>country-chicken-backend-${project.version}</finalName>
 
-OB        <plugins>
-OB            <plugin>
+        <!-- Predictable JAR name for Docker & Jenkins -->
+        <finalName>country-chicken-backend-${project.version}</finalName>
+
+        <plugins>
+
+            <!-- Spring Boot Plugin -->
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
-OB                <artifactId>spring-boot-maven-plugin</artifactId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
         </plugins>
-OBOB    </build>
+    </build>
+
+    <!-- ===================== -->
+    <!-- Profiles -->
+    <!-- ===================== -->
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
-
