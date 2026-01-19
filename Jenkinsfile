@@ -59,7 +59,7 @@ pipeline {
         ]) {
             sh """
 mvn clean deploy -DskipTests \
--DaltDeploymentRepository=nexus-releases::default::http://13.232.55.198:8081/repository/maven-releases/
+--DaltDeploymentRepository=nexus-snapshots::default::http://13.232.55.198:8081/repository/maven-snapshots/
 """
         }
     }
