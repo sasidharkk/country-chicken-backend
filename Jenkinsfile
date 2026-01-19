@@ -6,30 +6,33 @@ pipeline {
         jdk 'java17'
     }
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     environment {
-        APP_NAME         = 'country-chicken-backend'
+        APP_NAME = 'country-chicken-backend'
 
         NEXUS_MAVEN_URL  = '13.232.55.198:8081'
         NEXUS_DOCKER_URL = '13.232.55.198:8082'
 
-        MAVEN_REPO       = 'maven-releases'
-        DOCKER_REPO      = 'docker-releases'
+        MAVEN_REPO  = 'maven-releases'
+        DOCKER_REPO = 'docker-releases'
 
-        GROUP_ID         = 'com.countrychicken'
-        VERSION          = ''
-        JAR_NAME         = ''
+        GROUP_ID = 'com.countrychicken'
+        VERSION  = ''
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'stage1',
+                git branch: 'main',
                     url: 'https://github.com/sasidharkk/country-chicken-backend.git'
             }
         }
 
-        stage('Set Version') {
+        stage('Read Version') {
             steps {
                 script {
                     VERSION = sh(
@@ -38,40 +41,25 @@ pipeline {
                     ).trim()
 
                     if (!VERSION) {
-                        error "❌ Version not found from pom.xml"
+                        error "❌ Version not found in pom.xml"
                     }
 
-                    JAR_NAME = "${APP_NAME}-${VERSION}.jar"
-                    echo "✅ Version: ${VERSION}"
+                    echo "✅ Project Version: ${VERSION}"
                 }
             }
         }
 
-        stage('Build JAR') {
+        stage('Build & Deploy JAR to Nexus') {
             steps {
-                sh 'mvn clean package -DskipTests'
-            }
-        }
-
-        stage('Upload JAR to Nexus') {
-            steps {
-                nexusArtifactUploader(
-                    nexusVersion: 'nexus3',
-                    protocol: 'http',
-                    nexusUrl: "${NEXUS_MAVEN_URL}",
-                    groupId: "${GROUP_ID}",
-                    version: "${VERSION}",
-                    repository: "${MAVEN_REPO}",
+                withCredentials([usernamePassword(
                     credentialsId: 'nexus-credentials',
-                    artifacts: [
-                        [
-                            artifactId: "${APP_NAME}",
-                            classifier: '',
-                            file: "target/${JAR_NAME}",
-                            type: 'jar'
-                        ]
-                    ]
-                )
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+                    sh '''
+                    mvn clean deploy -DskipTests
+                    '''
+                }
             }
         }
 
@@ -79,13 +67,12 @@ pipeline {
             steps {
                 sh """
                 docker build \
-                  -t ${NEXUS_DOCKER_URL}/${DOCKER_REPO}/${APP_NAME}:${VERSION} \
-                  -t ${NEXUS_DOCKER_URL}/${DOCKER_REPO}/${APP_NAME}:latest .
+                  -t ${NEXUS_DOCKER_URL}/${DOCKER_REPO}/${APP_NAME}:${VERSION} .
                 """
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push Docker Image to Nexus') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'docker-nexus-credentials',
@@ -93,15 +80,10 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh """
-
                     echo "$DOCKER_PASS" | docker login ${NEXUS_DOCKER_URL} -u "$DOCKER_USER" --password-stdin
-
                     docker push ${NEXUS_DOCKER_URL}/${DOCKER_REPO}/${APP_NAME}:${VERSION}
-                    docker push ${NEXUS_DOCKER_URL}/${DOCKER_REPO}/${APP_NAME}:latest
-
                     docker logout ${NEXUS_DOCKER_URL}
                     """
-
                 }
             }
         }
@@ -109,13 +91,13 @@ pipeline {
 
     post {
         success {
-            echo "✅ Build & Push Successful"
+            echo "✅ CI Pipeline completed successfully"
         }
         failure {
-            echo "❌ Build Failed"
+            echo "❌ CI Pipeline failed"
         }
         always {
-            sh 'docker system prune -f'
+            sh 'docker info >/dev/null 2>&1 || true'
             cleanWs()
         }
     }
