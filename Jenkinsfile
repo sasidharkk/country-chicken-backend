@@ -57,10 +57,9 @@ pipeline {
                 passwordVariable: 'NEXUS_PASS'
             )
         ]) {
-            sh """
-mvn clean deploy -DskipTests \
--DaltDeploymentRepository=nexus-snapshots::default::http://13.232.55.198:8081/repository/maven-snapshots/
-"""
+            sh '''
+mvn clean deploy -DskipTests -DaltDeploymentRepository=nexus-snapshots::default::http://13.232.55.198:8081/repository/maven-snapshots/
+'''
         }
     }
 }
